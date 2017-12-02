@@ -25,6 +25,10 @@ const Model = function() {
 
     this.getConfiguration = function() {
         const config = this.clone();
+        const mediaModelAttributes = config.mediaModel.attributes;
+        config.position = mediaModelAttributes.position;
+        config.duration = mediaModelAttributes.duration;
+        config.buffer = mediaModelAttributes.buffer;
         delete config.instream;
         delete config.mediaModel;
         return config;
@@ -260,20 +264,23 @@ const syncProviderProperties = (model, provider) => {
 
 function syncPlayerWithMediaModel(mediaModel) {
     // Sync player state with mediaModel state
-    const mediaState = mediaModel.get('state');
+    const mediaState = mediaModel.get('mediaState');
     mediaModel.trigger('change:state', mediaModel, mediaState, mediaState);
 }
 
 // Represents the state of the provider/media element
 const MediaModel = Model.MediaModel = function() {
     this.attributes = {
-        state: STATE_IDLE
+        mediaState: STATE_IDLE
     };
 };
 
 Object.assign(MediaModel.prototype, SimpleModel, {
     srcReset() {
         const attributes = this.attributes;
+        attributes.position = 0;
+        attributes.duration = 0;
+        attributes.buffer = 0;
         attributes.setup = false;
         attributes.started = false;
         attributes.preloaded = false;
